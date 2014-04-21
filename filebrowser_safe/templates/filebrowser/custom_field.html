@@ -1,4 +1,4 @@
-{% load mezzanine_tags i18n future %}
+{% load mezzanine_tags i18n future tags%}
 <style>
 .mezz-fb-thumbnail {display:inline; margin-left:5px !important;}
 .mezz-fb-thumbnail img {width:20px; height:20px; margin-top:0 !important;}
@@ -12,15 +12,23 @@
     </a>
 {% endifequal %}
 {% ifequal final_attrs.format "Video-field" %}
-    {{ value }}
-<a style="padding:5px 16px;" href="javascript:FileBrowser.show('{{ final_attrs.id }}', '{% url "fb_browse_videos" %}?pop=1{% if final_attrs.directory %}&amp;dir={{ final_attrs.directory }}{% endif %}{% if final_attrs.format %}&amp;type={{ final_attrs.format }}{% endif %}');" class="fb_show">
-    <img src="{{ final_attrs.search_icon }}" alt="" />
+<a style="padding:5px 10px;" href="javascript:FileBrowser.show('{{ final_attrs.id }}', '{% url "fb_browse_videos" %}?pop=1{% if final_attrs.directory %}&amp;dir={{ final_attrs.directory }}{% endif %}{% if final_attrs.format %}&amp;type={{ final_attrs.format }}{% endif %}');" class="fb_show">
+    <img id="video_{{ final_attrs.id }}" src="{{ MEDIA_URL }}" class="preview" />
 </a>
 {% endifequal %}
+
 {% if value.filetype == "Image" %}
+
 <p class="help mezz-fb-thumbnail" id="help_{{ final_attrs.id }}">
     <a href="{{ value.url }}" target="_blank" id="link_{{ final_attrs.id }}">
         <img id="image_{{ final_attrs.id }}" src="{{ MEDIA_URL }}{% thumbnail value.path 60 60 %}" class="preview" />
+    </a>
+</p>
+
+{% elif value|is_instance_of_file %}
+<p class="help mezz-fb-thumbnail" id="help_{{ final_attrs.id }}">
+    <a href="{{ value.url }}" target="_blank" id="link_{{ final_attrs.id }}">
+        <img id="video_{{ final_attrs.id }}" src="{{ value | get_thumbnail_for_id }}" class="preview" />
     </a>
 </p>
 
@@ -45,4 +53,3 @@
     <strong>Format</strong> {{ final_attrs.format }}
 </p>
 {% endif %}
- 

@@ -5,16 +5,14 @@
 h1 {margin:-30px 0 15px 0;}
 </style>
 {% endif %}
-
 {% for file in videos.entry %}
-
             <!-- FILESELECT FOR FILEBROWSEFIELD -->
         {% ifequal query.pop '1' %}
         {% if results_var.select_total %}
         <td class="fb_icon">
             {% selectable file.filetype query.type %}
             {% if selectable %}
-            <a href="javascript://" onclick="FileSubmit('{{ file|get_thumbnail_url }}', '{{ file|get_thumbnail_url }}', '{{ file|get_thumbnail_url }}{% ifequal file.filetype 'Image' %}{% thumbnail file.path 60 60 %}{% else %}{{ file.path }}{% endifequal %}', '{{ "Video" }}');" class="fb_selectlink" title="{% trans 'Select' %}"></a>
+            <a href="javascript://" onclick="FileSubmit('{{ file.media.player.url }}', '{{ file|get_thumbnail_url }}', '{{ file|get_thumbnail_url }}', '{{ "Video-field" }}');" class="fb_selectlink" title="{% trans 'Select' %}"></a>
             {% else %}
             <img src="{{ settings_var.URL_FILEBROWSER_MEDIA }}img/filebrowser_icon_select_disabled.gif" width="23" height="17" />
             {% endif %}
@@ -28,7 +26,7 @@ h1 {margin:-30px 0 15px 0;}
         <td class="fb_icon">
             {% selectable file.filetype query.type %}
             {% if selectable %}
-            <a href="javascript:FileBrowserDialogue.fileSubmit('{{ file.url|escapejs }}');" class="fb_selectlink" title="{% trans 'Select File' %}"></a>
+            <a href="javascript:FileBrowserDialogue.fileSubmit('{{ file.media.player.url|escapejs }}');" class="fb_selectlink" title="{% trans 'Select File' %}"></a>
             {% else %}
             <img src="{{ settings_var.URL_FILEBROWSER_MEDIA }}img/filebrowser_icon_select_disabled.gif" width="23" height="17" />
             {% endif %}
@@ -42,7 +40,7 @@ h1 {margin:-30px 0 15px 0;}
         <td class="fb_icon">
             {% selectable file.filetype query.type %}
             {% if selectable %}
-            <a href="#" onclick="OpenFile(ProtectPath('{{ file.url|escapejs }}'));return false;" class="fb_selectlink" title="{% trans 'Select File' %}"></a>
+            <a href="#" onclick="OpenFile(ProtectPath('{{ file.media.player.url|escapejs }}'));return false;" class="fb_selectlink" title="{% trans 'Select File' %}"></a>
             {% else %}
             <img src="{{ settings_var.URL_FILEBROWSER_MEDIA }}img/filebrowser_icon_select_disabled.gif" width="23" height="17" />
             {% endif %}
@@ -56,7 +54,7 @@ h1 {margin:-30px 0 15px 0;}
         <td class="fb_icon">
             {% selectable file.filetype query.type %}
             {% if selectable %}
-            <a href="#" rel="{{ file.url|escape }}" class="fb_selectlink" title="{% trans 'Select File' %}"></a>
+            <a href="#" rel="{{ file.media.player.url|escape }}" class="fb_selectlink" title="{% trans 'Select File' %}"></a>
             {% else %}
             <img src="{{ settings_var.URL_FILEBROWSER_MEDIA }}img/filebrowser_icon_select_disabled.gif" width="23" height="17" />
             {% endif %}
@@ -70,13 +68,13 @@ h1 {margin:-30px 0 15px 0;}
         <!-- THUMBNAIL -->
         {% if results_var.images_total %}
         <td class="fb_icon">
-<!-- {#            {% ifequal file.filetype 'Image' %}#} -->
-<!-- {#            {% for v_thumbnail in file.media.thumbnail %}#} -->
+{#            {% ifequal file.filetype 'Image' %}#}
+{#            {% for v_thumbnail in file.media.thumbnail %}#}
             <div class="youtube-thumbnail">
                 <a href="{{ file.media.player.url }}" target="_blank"><img src="{{ file|get_thumbnail_url }}" title="{% trans 'View Image' %}" /></a>
             </div>
-<!-- {#            {% endfor %}#} -->
-<!-- {#            {% endifequal %}#} -->
+{#            {% endfor %}#}
+{#            {% endifequal %}#}
         </td>
         {% endif %}
 
@@ -108,7 +106,7 @@ h1 {margin:-30px 0 15px 0;}
         <!-- DEBUG -->
         {% if settings_var.DEBUG %}
         <td>
-            <strong>Filename</strong> {{ file.filename }}<br />
+            <strong>Filename</strong> {{ file.media.title.text }}<br />
             <strong>Filetype</strong> {{ file.filetype }}<br />
             <strong>Filesize</strong> {{ file.filesize }}<br />
             <strong>Extension</strong> {{ file.extension }}<br />
@@ -134,5 +132,3 @@ h1 {margin:-30px 0 15px 0;}
 
 </tr>
 {% endfor %}
-
-

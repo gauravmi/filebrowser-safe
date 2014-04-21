@@ -1,5 +1,5 @@
-<!-- {#get video info#} -->
-<!-- {#http://gdata.youtube.com/feeds/api/videos/4qZODSWwuqo?v=2&alt=jsonc#} -->
+{#get video info#}
+{#http://gdata.youtube.com/feeds/api/videos/4qZODSWwuqo?v=2&alt=jsonc#}
 
 {% load i18n future static fb_tags mezzanine_tags tags%}
 
@@ -15,6 +15,8 @@ h1 {margin:-30px 0 15px 0;}
         {% ifequal query.pop '1' %}
         {% if results_var.select_total %}
         <td class="fb_icon">
+            {{ file.filetype }}
+            {{ query.type }}
             {% selectable file.filetype query.type %}
             {% if selectable %}
                 <a href="javascript://" onclick="FileSubmit('{{ file.path }}', '{{ file.url }}', '{{ MEDIA_URL }}{% ifequal file.filetype 'Image' %}{% thumbnail file.path 60 60 %}{% else %}{{ file.path }}{% endifequal %}', '{{ file.filetype }}');" class="fb_selectlink" title="{% trans 'Select' %}"></a>
@@ -136,3 +138,5 @@ h1 {margin:-30px 0 15px 0;}
         {% endif %}
 </tr>
 {% endfor %}
+
+
