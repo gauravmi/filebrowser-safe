@@ -6,6 +6,7 @@ urlpatterns = patterns('',
 
     # filebrowser urls
     url(r'^browse/$', 'filebrowser_safe.views.browse', name="fb_browse"),
+    url(r'^browse_videos/$', 'filebrowser_safe.views.browse_videos', name="fb_browse_videos"),
     url(r'^mkdir/', 'filebrowser_safe.views.mkdir', name="fb_mkdir"),
     url(r'^upload/', 'filebrowser_safe.views.upload', name="fb_upload"),
     url(r'^rename/$', 'filebrowser_safe.views.rename', name="fb_rename"),

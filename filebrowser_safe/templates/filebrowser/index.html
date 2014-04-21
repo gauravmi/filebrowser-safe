@@ -43,7 +43,7 @@
 <link rel="stylesheet" type="text/css" href="{{ settings_var.URL_FILEBROWSER_MEDIA }}css/rtl.css" />
 {% endblock %}
 
-<!-- COLTYPE/BODYCLASS -->
+{#<!-- COLTYPE/BODYCLASS -->#}
 {% block coltype %}flex{% endblock %}
 {% block bodyclass %}change-list filebrowser{% if query.pop %} popup{% endif %}{% endblock %}
 
@@ -62,16 +62,24 @@
     <div class="module filtered" id="changelist">
         <div class="changelist-content">
             <div class="result-list-container">
-                {% if results_var.results_current %}
+<!-- {#                {% if results_var.results_current %}#} -->
                 <div class="result-list">
                     <table cellspacing="0">
                         {% include "filebrowser/include/tableheader.html" %}
                         <tbody>
-                        {% include "filebrowser/include/filelisting.html" %}
+                        {% if display == "Video-field" %}
+                            {% include "filebrowser/include/videofilelisting.html" %}
+                        {% elif display == "Image" %}
+                            {% include "filebrowser/include/filelisting.html" %}
+                        {% else %}
+                            {% include "filebrowser/include/filelisting.html" %}
+                            {% include "filebrowser/include/videofilelisting.html" %}
+                        {% endif %}
+
                         </tbody>
                     </table>
                 </div>
-                {% endif %}
+<!-- {#                {% endif %}#} -->
                 {% pagination %}
             </div>
         </div>

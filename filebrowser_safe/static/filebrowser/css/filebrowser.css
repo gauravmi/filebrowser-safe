@@ -27,3 +27,8 @@ table .fb_selectlink:link, table .fb_selectlink:visited { background-image: url(
 table .fb_selectlink:hover, table .fb_selectlink:active { background-image: url('../img/filebrowser_icon_select_hover.gif'); }
 table .fb_showversionslink:link, table .fb_showversionslink:visited { background-image: url('../img/filebrowser_icon_showversions.gif'); }
 table .fb_showversionslink:hover, table .fb_showversionslink:active { background-image: url('../img/filebrowser_icon_showversions_hover.gif'); }
+
+.youtube-thumbnail img{
+    display: block;
+    width: 60px;
+}
