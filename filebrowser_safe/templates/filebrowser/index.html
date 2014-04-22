@@ -1,7 +1,7 @@
 {% extends "admin/base_site.html" %}
 
 <!-- LOADING -->
-{% load i18n future static fb_tags fb_pagination %}
+{% load i18n future static fb_tags fb_pagination tags%}
 
 <!-- STYLESHEETS -->
 {% block stylesheets %}
@@ -55,6 +55,9 @@
 <div id="content-main">
     {% block object-tools %}
     <ul class="object-tools">
+    		{% if display|youtube %}
+    			<li><a href="{% url "fb_browse_videos"%}{% query_string 'type=Video-field' 'p' %}">{% trans "Videos" %}</a></li>
+    		{% endif %}
         <li><a href="{% url "fb_mkdir" %}{% query_string '' 'p' %}">{% trans "New Folder" %}</a></li>
         <li><a href="{% url "fb_upload" %}{% query_string '' 'p' %}" class="focus">{% trans "Upload" %}</a></li>
     </ul>
@@ -62,7 +65,7 @@
     <div class="module filtered" id="changelist">
         <div class="changelist-content">
             <div class="result-list-container">
-{#                {% if results_var.results_current %}#}
+                {% if results_var.results_current %}
                 <div class="result-list">
                     <table cellspacing="0">
                         {% include "filebrowser/include/tableheader.html" %}
@@ -73,13 +76,11 @@
                             {% include "filebrowser/include/filelisting.html" %}
                         {% else %}
                             {% include "filebrowser/include/filelisting.html" %}
-                            {% include "filebrowser/include/videofilelisting.html" %}
                         {% endif %}
-
                         </tbody>
                     </table>
                 </div>
-{#                {% endif %}#}
+                {% endif %}
                 {% pagination %}
             </div>
         </div>

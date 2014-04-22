@@ -26,6 +26,7 @@ import gdata
 import gdata.youtube
 import gdata.youtube.service
 import requests
+from filebrowser_safe.youtube_client import YoutubeClient
 
 try:
     from django.utils.encoding import smart_text
@@ -70,9 +71,10 @@ for k, v in VERSIONS.items():
     filter_re.append(re.compile(exp))
 
 def browse_videos(request):
-    yt_service = auth()
-    yt_service.ProgrammaticLogin()
-    videos = yt_service.GetYouTubeVideoFeed("https://gdata.youtube.com/feeds/api/users/default/uploads")
+    client = YoutubeClient()
+    client.authenticate()
+    client.yt_service.ProgrammaticLogin()
+    videos = client.yt_service.GetYouTubeVideoFeed("https://gdata.youtube.com/feeds/api/users/default/uploads")
     results_var = {'results_total': 0, 'results_current': 0, 'delete_total': 0, 'images_total': 0, 'select_total': 0}
     query = request.GET.copy()
 
@@ -88,14 +90,12 @@ def browse_videos(request):
     except (EmptyPage, InvalidPage):
         page = p.page(p.num_pages)
     display = request.GET.get("type",False)
-    print display
     for video in videos.entry:
         results_var['results_total'] += 1
         results_var['images_total'] += 1
-        results_var['delete_total'] += 1
-        results_var['delete_total'] += 1
-        results_var['select_total'] += 1
-        results_var['select_total'] += 1
+        results_var['delete_total'] += 1        
+        results_var['select_total'] += 1        
+        results_var['results_current'] += 1
     return render_to_response('filebrowser/index.html', {
         'display': display,
         'p': p,
@@ -114,9 +114,11 @@ def browse(request):
 
     # QUERY / PATH CHECK
     # type_of_list = ""
-    yt_service = auth()
-    yt_service.ProgrammaticLogin()
-    videos = yt_service.GetYouTubeVideoFeed("https://gdata.youtube.com/feeds/api/users/default/uploads")
+    client = YoutubeClient()
+    client.authenticate()
+    client.yt_service.ProgrammaticLogin()
+
+    videos = client.yt_service.GetYouTubeVideoFeed("https://gdata.youtube.com/feeds/api/users/default/uploads")
 
     query = request.GET.copy()
     path = get_path(query.get('dir', ''))
@@ -197,9 +199,7 @@ def browse(request):
     if not request.GET.get('ot') and DEFAULT_SORTING_ORDER == "desc" or request.GET.get('ot') == "desc":
         files.reverse()
     files.append(videos.entry)
-    print "**********"
     p = Paginator(files, LIST_PER_PAGE)
-    print p
     try:
         page_nr = request.GET.get('p', '1')
     except:
@@ -208,35 +208,10 @@ def browse(request):
         page = p.page(page_nr)
     except (EmptyPage, InvalidPage):
         page = p.page(p.num_pages)
-    print "page **********"
-    print page.object_list
-    # print videos.entry
-    print "---------"
-    # print files
-
-    print "query-----------"
-    print query
-    print "path------------"
-    print path
-    print "dir------------"
-    print directory
-    print "page------------"
-    print page
-    print "p------------"
-    print p
-    print "result------------"
-    print results_var
-    print "counte------------"
-    print counter
-    print "media------------"
-    print _(u'Media Library')
-    print "bread------------"
-    print get_breadcrumbs(query, path)
-    print "----------"
     display = request.GET.get("type", False)
-    print display
     return render_to_response('filebrowser/index.html', {
         'display': display,
+        'type':'Video-field',
         'dir': path,
         'p': p,
         'page': page,
@@ -357,7 +332,6 @@ def _check_file(request):
             if k != "folder":
                 if default_storage.exists(os.path.join(get_directory(), folder, v)):
                     fileArray[k] = v
-    print dumps(fileArray)
     return HttpResponse(dumps(fileArray))
 
 
@@ -365,41 +339,15 @@ def _check_file(request):
 filebrowser_pre_upload = Signal(providing_args=["path", "file"])
 filebrowser_post_upload = Signal(providing_args=["path", "file"])
 
-def GetAuthSubUrl():
-  nexturl = 'http://localhost:8000/uploaded'
-  scope = 'https://www.googleapis.com/auth/youtube.upload'
-  secure = False
-  session = True
-  yt_service = gdata.youtube.service.YouTubeService()
-  return yt_service.GenerateAuthSubURL(nexturl, scope, secure, session)
-
-def auth():
-    yt_service = gdata.youtube.service.YouTubeService()
-    yt_service.ssl = True
-
-    yt_service.developer_key = 'AI39si6KKAEUy9GVPXYLsx3EW1Rp8QZM-AU8Yyf-_NeUMP3NtAMGASKj6H54LTsw6BC0Dcs_trJhRfY1mBervYYVQGeNI4y1yw'
-    yt_service.client_id = '906138919826.apps.googleusercontent.com'
-
-    yt_service.email = 'gmi3024@gmail.com'
-    yt_service.password = 'Amplify#1993'
-    yt_service.source = 'youtube'
-    return yt_service
-
 def upload_to_youtube(request):
-    yt_service = auth()
-    print "--=-=-=-=-=-=-=-=-=-=--=-==="
-    # parameters = cgi.FieldStorage()
-    # authsub_token = parameters['token']
-    # yt_service.SetAuthSubToken(authsub_token)
+		client = YoutubeClient()
+		client.authenticate()
+		client.yt_service.ProgrammaticLogin()
 
-    yt_service.ProgrammaticLogin()
-    authSubUrl = GetAuthSubUrl()
-    print '<a href="%s">Login to your Google account</a>' % authSubUrl
-
-    my_media_group = gdata.media.Group(
-    title=gdata.media.Title(text='My Test Movie'),
-    description=gdata.media.Description(description_type='plain',
-                                      text='My description'),
+		media_group = gdata.media.Group(
+		title=gdata.media.Title(text=request.POST["Filename"]),
+    # description=gdata.media.Description(description_type='plain',
+                                      # text='My description'),
     keywords=gdata.media.Keywords(text='cars, funny'),
     category=[gdata.media.Category(
         text='Autos',
@@ -408,23 +356,18 @@ def upload_to_youtube(request):
         player=None
     )
     # create video entry as usual
-    video_entry = gdata.youtube.YouTubeVideoEntry(media=my_media_group)
+		video_entry = gdata.youtube.YouTubeVideoEntry(media=media_group)
 
-    # new_entry = yt_service.InsertVideoEntry(video_entry, request.FILES['Filedata'])
-    # upload meta data only
-    # yt_service.UpgradeToSessionToken()
-
-    response = yt_service.GetFormUploadToken(video_entry)
-    print response
+		response = client.yt_service.GetFormUploadToken(video_entry)
     # parse response tuple and use the variables to build a form (see next code snippet)
-    post_url = response[0]
-    youtube_token = response[1]
-    h = Http()
-    data = dict(file=request.FILES['Filedata'],token=youtube_token)
-    submit_req = post_url+"?nexturl=http://localhost:3000/uploaded&token="+youtube_token
-    content = h.request(submit_req,"POST", urlencode(data))
-    print "----------------------"
-    print content
+		post_url = response[0]
+		youtube_token = response[1]
+		h = Http()
+		data = dict(file=request.FILES['Filedata'])
+		nexturl = settings.YOUTUBE["redirect_url"]
+		submit_req = post_url+"?nexturl="+nexturl+"&token="+youtube_token
+		content = h.request(submit_req,"POST", urlencode(data))
+		print content
 
 def video_file(filedata):
     formats = ["mp4","mov","flv","swf","svi","mpeg","avi","wmv"]
@@ -443,7 +386,6 @@ def _upload_file(request):
         folder = request.POST.get('folder')
         fb_uploadurl_re = re.compile(r'^.*(%s)' % reverse("fb_upload"))
         folder = fb_uploadurl_re.sub('', folder)
-        print "**********   222"
         if request.FILES:
             filedata = request.FILES['Filedata']
             if video_file(filedata):
