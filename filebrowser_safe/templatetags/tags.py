@@ -1,7 +1,7 @@
 from django import template
 from filebrowser_safe.settings import *
 # from django.template.defaultfilters import stringfilter
-
+from django.core.urlresolvers import reverse
 import re
 
 register = template.Library()
@@ -22,7 +22,18 @@ def youtube(v):
 		settings.YOUTUBE = None
 	return settings.YOUTUBE is not None
 
+def video_id(url):
+	return re.findall(r'(?<=v=)(.*)(?=&)', url)[0]
+
+@register.simple_tag(name='get_upload_url')
+def get_upload_url(display,posturl):
+	if display:
+		return posturl
+	else:
+		return reverse(posturl)
+
 register.filter('get_thumbnail_url',get_thumbnail_url)
 register.filter('get_thumbnail_for_id',get_thumbnail_for_id)
 register.filter('is_instance_of_file',is_instance_of_file)
 register.filter('youtube',youtube)
+register.filter('video_id',video_id)

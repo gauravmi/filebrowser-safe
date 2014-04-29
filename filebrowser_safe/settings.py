@@ -115,6 +115,7 @@ LIST_PER_PAGE = getattr(settings, "FILEBROWSER_LIST_PER_PAGE", 50)
 # Default Sorting
 # Options: date, filesize, filename_lower, filetype_checked
 DEFAULT_SORTING_BY = getattr(settings, "FILEBROWSER_DEFAULT_SORTING_BY", "date")
+YT_DEFAULT_LIST_PER_PAGE = getattr(settings, "YOUTUBE_DEFAULT_LIST_PER_PAGE", 50)
 # Sorting Order: asc, desc
 DEFAULT_SORTING_ORDER = getattr(settings, "FILEBROWSER_DEFAULT_SORTING_ORDER", "desc")
 # regex to clean dir names before creation

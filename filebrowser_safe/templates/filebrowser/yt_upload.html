@@ -1,0 +1,58 @@
+{% extends "admin/base_site.html" %}
+
+{% load i18n l10n future static fb_tags mezzanine_tags %}
+{% load url from future %}
+{% load tags %}
+
+{% block stylesheets %}
+    {{ block.super }}
+    <link rel="stylesheet" type="text/css" href="{% static "grappelli/css/forms.css" %}" />
+    <link rel="stylesheet" type="text/css" href="{{ settings_var.URL_FILEBROWSER_MEDIA }}css/filebrowser.css" />
+    <link rel="stylesheet" type="text/css" href="{{ settings_var.URL_FILEBROWSER_MEDIA }}css/yt_upload.css" />
+{% endblock %}
+
+{% block content_title %}<h1>{% include "filebrowser/include/breadcrumbs.html" %}</h1>{% endblock %}
+{% block breadcrumbs %}<div class="breadcrumbs"></div>{% endblock %}
+{% block content %}
+	<div id="content-main">
+		<form action="{{posturl}}" method="post" enctype="multipart/form-data">
+			<fieldset class="module aligned">        	
+        <div class="form-row">
+        	<label>SELECT FILE
+						<input type="file" name="file_upload" id="yt_file_upload" class="select_file" multiple/>
+					</label>
+			</div>
+		</fieldset>
+				<input name="token" type="hidden" value="{{youtube_token}}"/>
+				<div class="yt-submit-row">
+					<input class="default yt-submit" type="submit" value='{% trans "Upload" %}' />
+				</div>
+		</form>
+		<br>
+		<br>
+		<fieldset class="module aligned collapse-closed">
+        <h2>{% trans "Help" %}</h2>
+        <div class="form-row" >
+            {% for extension in settings_var.EXTENSIONS.items %}
+            {% ifnotequal extension.0 'Folder' %}
+            <label class="required">{% if forloop.first %}{% trans "Allowed" %}:{% else %}&nbsp;{% endif %}</label>
+            <p>{{ extension.0|safe }} ({{ extension.1|join:", "|safe }})</p>
+            {% endifnotequal %}
+            {% endfor %}
+        </div>
+        <div class="form-row" >
+            <label class="required">{% trans "Max. Filesize" %}:</label>
+            <p>{{ settings_var.MAX_UPLOAD_SIZE|filesizeformat }}</p>
+        </div>
+        {% if settings_var.CONVERT_FILENAME %}
+        <div class="form-row" >
+            <label class="required">&nbsp;</label>
+            <p>
+                {% trans "The Name will be converted to lowercase. Spaces will be replaced with underscores." %}
+            </p>
+        </div>
+        {% endif %}
+    </fieldset>    
+	</div>
+
+{% endblock %}

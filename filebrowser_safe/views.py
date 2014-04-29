@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 import cgi
-
+import json
 from json import dumps
 import os
 import re
@@ -78,9 +78,8 @@ def browse_videos(request):
     results_var = {'results_total': 0, 'results_current': 0, 'delete_total': 0, 'images_total': 0, 'select_total': 0}
     query = request.GET.copy()
 
-    # query['o'] = request.GET.get('o', DEFAULT_SORTING_BY)
-    query['ot'] = "desc" # request.GET.get('ot', DEFAULT_SORTING_ORDER)
-    p = Paginator(videos.entry, 2)
+    query['ot'] = "desc"
+    p = Paginator(videos.entry, YT_DEFAULT_LIST_PER_PAGE)
     try:
         page_nr = request.GET.get('p', '1')
     except:
@@ -89,13 +88,9 @@ def browse_videos(request):
         page = p.page(page_nr)
     except (EmptyPage, InvalidPage):
         page = p.page(p.num_pages)
-    display = request.GET.get("type",False)
-    for video in videos.entry:
-        results_var['results_total'] += 1
-        results_var['images_total'] += 1
-        results_var['delete_total'] += 1        
-        results_var['select_total'] += 1        
-        results_var['results_current'] += 1
+    display = request.GET.get("type", False)
+    results_var['results_current']=results_var['select_total']=results_var['results_total']=results_var['images_total'] = len(videos.entry)
+
     return render_to_response('filebrowser/index.html', {
         'display': display,
         'p': p,
@@ -114,12 +109,6 @@ def browse(request):
 
     # QUERY / PATH CHECK
     # type_of_list = ""
-    client = YoutubeClient()
-    client.authenticate()
-    client.yt_service.ProgrammaticLogin()
-
-    videos = client.yt_service.GetYouTubeVideoFeed("https://gdata.youtube.com/feeds/api/users/default/uploads")
-
     query = request.GET.copy()
     path = get_path(query.get('dir', ''))
     directory = get_path('')
@@ -131,7 +120,7 @@ def browse(request):
             # The directory returned by get_directory() does not exist, raise an error to prevent eternal redirecting.
             raise ImproperlyConfigured(_("Error finding Upload-Folder. Maybe it does not exist?"))
         redirect_url = reverse("fb_browse") + query_helper(query, "", "dir")
-        return HttpResponseRedirect(redirect_url)
+        return HttpResponseRedirect(True)
     abs_path = os.path.join(get_directory(), path)
 
     # INITIAL VARIABLES
@@ -198,7 +187,6 @@ def browse(request):
     files = sorted(files, key=lambda f: getattr(f, request.GET.get('o', DEFAULT_SORTING_BY)))
     if not request.GET.get('ot') and DEFAULT_SORTING_ORDER == "desc" or request.GET.get('ot') == "desc":
         files.reverse()
-    files.append(videos.entry)
     p = Paginator(files, LIST_PER_PAGE)
     try:
         page_nr = request.GET.get('p', '1')
@@ -211,7 +199,6 @@ def browse(request):
     display = request.GET.get("type", False)
     return render_to_response('filebrowser/index.html', {
         'display': display,
-        'type':'Video-field',
         'dir': path,
         'p': p,
         'page': page,
@@ -222,7 +209,6 @@ def browse(request):
         'settings_var': get_settings_var(),
         'breadcrumbs': get_breadcrumbs(query, path),
         'breadcrumbs_title': "",
-        'videos': videos
     }, context_instance=Context(request))
 browse = staff_member_required(never_cache(browse))
 
@@ -286,7 +272,6 @@ def mkdir(request):
     }, context_instance=Context(request))
 mkdir = staff_member_required(never_cache(mkdir))
 
-
 def upload(request):
     """
     Multiple File Upload.
@@ -300,15 +285,52 @@ def upload(request):
     if path is None:
         msg = _('The requested Folder does not exist.')
         messages.add_message(request, messages.ERROR, msg)
-        return HttpResponseRedirect(reverse("fb_browse"))
+        return HttpResponseRedirect(True)
 
     # SESSION (used for flash-uploading)
     cookie_dict = parse_cookie(request.META.get('HTTP_COOKIE', ''))
     engine = __import__(settings.SESSION_ENGINE, {}, {}, [''])
     session_key = cookie_dict.get(settings.SESSION_COOKIE_NAME, None)
+    display = request.GET.get('type',False)
+    posturl = "fb_do_upload"
+    youtube_token = ""
+    template = 'upload.html'
+    if display:
+				client = YoutubeClient()
+				client.authenticate()
+				client.yt_service.ProgrammaticLogin()
 
-    return render_to_response('filebrowser/upload.html', {
+				media_group = gdata.media.Group(
+				title=gdata.media.Title(text="title"),
+				description=gdata.media.Description(description_type='plain',
+                                      text='description'),
+				keywords=gdata.media.Keywords(text='people'),
+				category=[gdata.media.Category(
+					text='Autos',
+					scheme='http://gdata.youtube.com/schemas/2007/categories.cat',
+					label='Autos')],
+					player=None
+				)
+				# create video entry as usual
+				video_entry = gdata.youtube.YouTubeVideoEntry(media=media_group)
+
+				response = client.yt_service.GetFormUploadToken(video_entry)
+				# parse response tuple and use the variables to build a form (see next code snippet)
+				posturl = response[0]
+				youtube_token = response[1]
+				nexturl = ""
+				if settings.YOUTUBE:
+						print settings.YOUTUBE["redirect_url"]
+						nexturl = settings.YOUTUBE["redirect_url"]
+
+				redirect_url_with_video_type = '%s?%s' % (nexturl,'type=Video-field')
+				posturl = posturl+"?nexturl="+redirect_url_with_video_type
+				template = 'yt_upload.html'
+    return render_to_response('filebrowser/'+template, {
+				'youtube_token':youtube_token,
+				'posturl': posturl,
         'query': query,
+        'display': display,
         'title': _(u'Select files to upload'),
         'settings_var': get_settings_var(),
         'session_key': session_key,
@@ -339,39 +361,15 @@ def _check_file(request):
 filebrowser_pre_upload = Signal(providing_args=["path", "file"])
 filebrowser_post_upload = Signal(providing_args=["path", "file"])
 
-def upload_to_youtube(request):
-		client = YoutubeClient()
-		client.authenticate()
-		client.yt_service.ProgrammaticLogin()
-
-		media_group = gdata.media.Group(
-		title=gdata.media.Title(text=request.POST["Filename"]),
-    # description=gdata.media.Description(description_type='plain',
-                                      # text='My description'),
-    keywords=gdata.media.Keywords(text='cars, funny'),
-    category=[gdata.media.Category(
-        text='Autos',
-        scheme='http://gdata.youtube.com/schemas/2007/categories.cat',
-        label='Autos')],
-        player=None
-    )
-    # create video entry as usual
-		video_entry = gdata.youtube.YouTubeVideoEntry(media=media_group)
-
-		response = client.yt_service.GetFormUploadToken(video_entry)
-    # parse response tuple and use the variables to build a form (see next code snippet)
-		post_url = response[0]
-		youtube_token = response[1]
-		h = Http()
-		data = dict(file=request.FILES['Filedata'])
-		nexturl = settings.YOUTUBE["redirect_url"]
-		submit_req = post_url+"?nexturl="+nexturl+"&token="+youtube_token
-		content = h.request(submit_req,"POST", urlencode(data))
-		print content
-
-def video_file(filedata):
-    formats = ["mp4","mov","flv","swf","svi","mpeg","avi","wmv"]
-    return str(filedata.name).split(".")[-1] in formats
+def delete_video(request):
+	client = YoutubeClient()
+	client.authenticate()
+	client.yt_service.ProgrammaticLogin()
+	entry = client.yt_service.GetYouTubeVideoEntry('https://gdata.youtube.com/feeds/api/users/default/uploads/'+request.GET['video_id'])
+	response = client.yt_service.DeleteVideoEntry(entry)
+	redirect_url = reverse('yt_browse_videos')
+	redirect_url_with_query_string = '%s?%s' % (redirect_url,'type=Video-field')
+	return HttpResponseRedirect(redirect_url_with_query_string)
 
 @csrf_exempt
 @flash_login_required
@@ -386,28 +384,26 @@ def _upload_file(request):
         folder = request.POST.get('folder')
         fb_uploadurl_re = re.compile(r'^.*(%s)' % reverse("fb_upload"))
         folder = fb_uploadurl_re.sub('', folder)
+
         if request.FILES:
             filedata = request.FILES['Filedata']
-            if video_file(filedata):
-                upload_to_youtube(request)
-            else:
-                # PRE UPLOAD SIGNAL
-                filebrowser_pre_upload.send(sender=request, path=request.POST.get('folder'), file=filedata)
+            # PRE UPLOAD SIGNAL
+            filebrowser_pre_upload.send(sender=request, path=request.POST.get('folder'), file=filedata)
 
-                filedata.name = convert_filename(filedata.name)
+            filedata.name = convert_filename(filedata.name)
 
-                # HANDLE UPLOAD
-                exists = default_storage.exists(os.path.join(get_directory(), folder, filedata.name))
-                abs_path = os.path.join(get_directory(), folder, filedata.name)
-                uploadedfile = default_storage.save(abs_path, filedata)
+            # HANDLE UPLOAD
+            exists = default_storage.exists(os.path.join(get_directory(), folder, filedata.name))
+            abs_path = os.path.join(get_directory(), folder, filedata.name)
+            uploadedfile = default_storage.save(abs_path, filedata)
 
-                path = os.path.join(get_directory(), folder)
-                file_name = os.path.join(path, filedata.name)
-                if exists:
-                    default_storage.move(smart_text(uploadedfile), smart_text(file_name), allow_overwrite=True)
+            path = os.path.join(get_directory(), folder)
+            file_name = os.path.join(path, filedata.name)
+            if exists:
+                default_storage.move(smart_text(uploadedfile), smart_text(file_name), allow_overwrite=True)
 
-                # POST UPLOAD SIGNAL
-                filebrowser_post_upload.send(sender=request, path=request.POST.get('folder'), file=FileObject(smart_text(file_name)))
+            # POST UPLOAD SIGNAL
+            filebrowser_post_upload.send(sender=request, path=request.POST.get('folder'), file=FileObject(smart_text(file_name)))
     return HttpResponse('True')
 
 

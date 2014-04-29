@@ -2,7 +2,7 @@
 
 <!-- LOADING -->
 {% load i18n l10n future static fb_tags mezzanine_tags %}
-
+{% load tags%}
 <!-- STYLESHEETS -->
 {% block stylesheets %}
     {{ block.super }}
@@ -27,7 +27,7 @@
         }
         $('#id_file').uploadify({
             'uploader'          : proxy + '{{ settings_var.URL_FILEBROWSER_MEDIA }}uploadify/uploadify.swf',
-            'script'            : '{% url "fb_do_upload" %}',
+            'script'            : '{% get_upload_url display posturl %}',
             'scriptData'        : {'session_key': '{{session_key}}'},
             'checkScript'       : '{% url "fb_check" %}',
             'cancelImg'         : '{{ settings_var.URL_FILEBROWSER_MEDIA }}uploadify/cancel.png',

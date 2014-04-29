@@ -7,6 +7,7 @@
 {% else %}
     {% trans 'Media Library' %}
 {% endif %}
+
 {% for item in breadcrumbs %}
     {% if not forloop.last %}
         <a href="{% url "fb_browse" %}{% query_string "" "dir,filename,p" %}&amp;dir={{ item.1 }}">{{ item.0 }}</a> <span>&rsaquo;</span>
@@ -18,5 +19,7 @@
         {% endif %}
     {% endif %}
 {% endfor %}
-{% if breadcrumbs_title %}{{ breadcrumbs_title }}{% endif %}
+{%if display %}{{"Youtube Upload"}}
+{% elif breadcrumbs_title %}{{ breadcrumbs_title }}
+{% endif %}
 </span>

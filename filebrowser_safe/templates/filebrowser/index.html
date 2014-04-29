@@ -56,10 +56,15 @@
     {% block object-tools %}
     <ul class="object-tools">
     		{% if display|youtube %}
-    			<li><a href="{% url "fb_browse_videos"%}{% query_string 'type=Video-field' 'p' %}">{% trans "Videos" %}</a></li>
+					<li><a href="{% url "yt_browse_videos"%}{% query_string 'type=Video-field' 'p' %}">{% trans "Videos" %}</a></li>
     		{% endif %}
-        <li><a href="{% url "fb_mkdir" %}{% query_string '' 'p' %}">{% trans "New Folder" %}</a></li>
-        <li><a href="{% url "fb_upload" %}{% query_string '' 'p' %}" class="focus">{% trans "Upload" %}</a></li>
+				{% if display != "Video-field" %}
+					<li><a href="{% url "fb_mkdir" %}{% query_string '' 'p' %}">{% trans "New Folder" %}</a></li>
+					<li><a href="{% url "fb_upload" %}{% query_string '' 'p' %}" class="focus">{% trans "Upload" %}</a></li>
+        {% else %}
+					<li><a href="{% url "fb_upload" %}{% query_string 'type=Video-field' 'p' %}" class="focus">{% trans "Upload" %}</a></li>
+        {% endif %}
+
     </ul>
     {% endblock %}
     <div class="module filtered" id="changelist">
