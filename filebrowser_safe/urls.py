@@ -6,7 +6,9 @@ urlpatterns = patterns('',
 
     #youtube upload urls
     url(r'^browse_videos/$', 'filebrowser_safe.views.browse_videos', name="yt_browse_videos"),
-		url(r'^delete_from_yt$', 'filebrowser_safe.views.delete_video', name="yt_delete_video"),
+	url(r'^delete_from_yt$', 'filebrowser_safe.views.delete_video', name="yt_delete_video"),
+	url(r'^get_access_token$','filebrowser_safe.views.get_access_token', name="get_yt_token"),
+
 		# filebrowser urls
     url(r'^browse/$', 'filebrowser_safe.views.browse', name="fb_browse"),
     url(r'^mkdir/', 'filebrowser_safe.views.mkdir', name="fb_mkdir"),

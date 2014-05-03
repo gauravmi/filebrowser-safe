@@ -70,11 +70,62 @@ for k, v in VERSIONS.items():
     exp = (r'_%s.(%s)') % (k, '|'.join(EXTENSION_LIST))
     filter_re.append(re.compile(exp))
 
+def get_access_token(request):
+		client = YoutubeClient()
+		client.authenticate()
+		client.yt_service.ProgrammaticLogin()
+		data = dict(request.GET.iterlists())
+
+		title= data['title'][0]
+		description= data['description'][0]
+
+		media_group = gdata.media.Group(
+		title=gdata.media.Title(text=title),
+		description=gdata.media.Description(description_type='plain',
+		                              text=description),
+		keywords=gdata.media.Keywords(text='people'),
+		category=[gdata.media.Category(
+			text='Autos',
+			scheme='http://gdata.youtube.com/schemas/2007/categories.cat',
+			label='Autos')],
+			player=None
+		)
+		# create video entry as usual
+		video_entry = gdata.youtube.YouTubeVideoEntry(media=media_group)
+
+		response = client.yt_service.GetFormUploadToken(video_entry)
+		# parse response tuple and use the variables to build a form (see next code snippet)
+		posturl = response[0]
+		youtube_token = response[1]
+
+		nexturl = ""
+		if settings.YOUTUBE:
+				print settings.YOUTUBE["redirect_url"]
+				nexturl = settings.YOUTUBE["redirect_url"]
+
+		redirect_url_with_video_type = '%s?%s' % (nexturl,'type=Video-field')
+		posturl = posturl+"?nexturl="+ redirect_url_with_video_type
+
+		response_data = {
+			'posturl':posturl,
+			'youtube_token':youtube_token,
+		}
+		return HttpResponse(json.dumps(response_data), content_type="application/json")
+
 def browse_videos(request):
     client = YoutubeClient()
     client.authenticate()
     client.yt_service.ProgrammaticLogin()
-    videos = client.yt_service.GetYouTubeVideoFeed("https://gdata.youtube.com/feeds/api/users/default/uploads")
+    search_terms = request.GET.get('q',False)
+    if search_terms:
+		query = gdata.youtube.service.YouTubeVideoQuery()
+		query.vq = search_terms
+		query.author = "+Gaurav"
+		query.orderby = 'viewCount'
+		videos = client.yt_service.YouTubeQuery(query)
+    else:
+        videos = client.yt_service.GetYouTubeVideoFeed("https://gdata.youtube.com/feeds/api/users/default/uploads")
+
     results_var = {'results_total': 0, 'results_current': 0, 'delete_total': 0, 'images_total': 0, 'select_total': 0}
     query = request.GET.copy()
 
@@ -296,35 +347,6 @@ def upload(request):
     youtube_token = ""
     template = 'upload.html'
     if display:
-				client = YoutubeClient()
-				client.authenticate()
-				client.yt_service.ProgrammaticLogin()
-
-				media_group = gdata.media.Group(
-				title=gdata.media.Title(text="title"),
-				description=gdata.media.Description(description_type='plain',
-                                      text='description'),
-				keywords=gdata.media.Keywords(text='people'),
-				category=[gdata.media.Category(
-					text='Autos',
-					scheme='http://gdata.youtube.com/schemas/2007/categories.cat',
-					label='Autos')],
-					player=None
-				)
-				# create video entry as usual
-				video_entry = gdata.youtube.YouTubeVideoEntry(media=media_group)
-
-				response = client.yt_service.GetFormUploadToken(video_entry)
-				# parse response tuple and use the variables to build a form (see next code snippet)
-				posturl = response[0]
-				youtube_token = response[1]
-				nexturl = ""
-				if settings.YOUTUBE:
-						print settings.YOUTUBE["redirect_url"]
-						nexturl = settings.YOUTUBE["redirect_url"]
-
-				redirect_url_with_video_type = '%s?%s' % (nexturl,'type=Video-field')
-				posturl = posturl+"?nexturl="+redirect_url_with_video_type
 				template = 'yt_upload.html'
     return render_to_response('filebrowser/'+template, {
 				'youtube_token':youtube_token,
