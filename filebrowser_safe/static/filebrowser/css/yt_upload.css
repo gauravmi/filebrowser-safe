@@ -1,6 +1,56 @@
-.yt-submit{
-		/*position: fixed;		*/
-		right: 20px;
+#upload-file-container {
+   background: url('../img/select.png') no-repeat;
+}
+
+#upload-file-container input {
+   filter: alpha(opacity=0);
+   opacity: 0;
+   height: 30px;
+   cursor: pointer;
+}
+.progress{
+	background-color: #E5E5E5;
+	margin-top: 10px;
+	width: 100%;
+	height: 2px;
+}
+#loader{
+	height: 9px;
+	width: 10px;
+}
+#message{
+	display: none;
+	text-align: center;
+	position: relative;
+	margin: 0px auto;
+	z-index: 1002;
+	background-color: #F5F5F5;
+	border: 2px solid #E5E5E5;
+	font: 11px Verdana, Geneva, sans-serif;
+	padding: 10px;
+	width: 350px;
+	top: 61px;
+}
+#disablingDiv{
+  display: none;
+  z-index:1001;
+  position: absolute;
+  top: 0%;
+  left: 0%;
+  width: 100%;
+  height: 700px;
+  background-color: white;
+  opacity:0.8;
+  filter: alpha(opacity=00);
+}
+.file-name-container{
+	display: none;
+	background-color: #F5F5F5;
+	border: 2px solid #E5E5E5;
+	font: 11px Verdana, Geneva, sans-serif;
+	margin-top: 5px;
+	padding: 10px;
+	width: 350px;
 }
 .yt-submit-row{
 	position: fixed;
@@ -12,18 +62,4 @@
 	background: #e6e6e6;
 	border-top: 1px solid #ccc;
 	text-align: right;
-}
-#yt_file_upload{
-	margin-left: -9999px;
-}
-label{
-	height: 25px;
-	width: 119px !important;
-	padding-left: 5px !important;
-	margin-bottom: 5px;
-	border: 1px solid black;
-	border-radius: 3px;
-	line-height: 31px;
-	color: white;	
-	background: radial-gradient(#424242 0%, #424242 0%, gray 100%);	
 }

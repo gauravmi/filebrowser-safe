@@ -14,19 +14,22 @@
 {% block content_title %}<h1>{% include "filebrowser/include/breadcrumbs.html" %}</h1>{% endblock %}
 {% block breadcrumbs %}<div class="breadcrumbs"></div>{% endblock %}
 {% block content %}
+	<div id="disablingDiv"></div>
+	<div id="message">Uploading  <img id="loader" src="{{ settings_var.URL_FILEBROWSER_MEDIA }}img/loadinfo.gif"></div>
 	<div id="content-main">
-		<form action="{{posturl}}" method="post" enctype="multipart/form-data">
-			<fieldset class="module aligned">        	
-        <div class="form-row">
-        	<label>SELECT FILE
-						<input type="file" name="file_upload" id="yt_file_upload" class="select_file" multiple/>
-					</label>
+		<form id="#yt_upload_video" name="upload_video_to_youtube"method="post" enctype="multipart/form-data">
+			<fieldset class="module aligned">
+                <div class="form-row">
+                    <div id='upload-file-container'>
+                        <input type="file" name="file_upload" id="yt_file_upload" class="select_file" multiple/>
+                            <div class="file-name-container"></div>
+                    </div>
+                </div>
+            </fieldset>
+			<input name="token" type="hidden" value=""/>
+			<div class="yt-submit-row">
+				<input id="submit-button" class="default yt-submit" type="button" value='{% trans "Upload" %}' />
 			</div>
-		</fieldset>
-				<input name="token" type="hidden" value="{{youtube_token}}"/>
-				<div class="yt-submit-row">
-					<input class="default yt-submit" type="submit" value='{% trans "Upload" %}' />
-				</div>
 		</form>
 		<br>
 		<br>
@@ -54,5 +57,6 @@
         {% endif %}
     </fieldset>    
 	</div>
-
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+<script type="text/javascript" src="{{ settings_var.URL_FILEBROWSER_MEDIA }}js/yt_upload.js"></script>
 {% endblock %}
