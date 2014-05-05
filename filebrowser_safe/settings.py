@@ -49,6 +49,10 @@ EXTENSIONS = getattr(settings, "FILEBROWSER_EXTENSIONS", {
     'Code': ['.html', '.py', '.js', '.css']
 })
 
+YT_SUPPORTED_FILE_FORMATS = getattr(settings, "YOUTUBE_SUPPORTED_FILE_FORMATS",
+    {'Video': ['.MOV','.MPEG4','.AVI','.WMV','.MPEGPS','.FLV','3GPP','WebM'],
+})
+
 # Define different formats for allowed selections.
 # This has to be a subset of EXTENSIONS.
 SELECT_FORMATS = getattr(settings, "FILEBROWSER_SELECT_FORMATS", {

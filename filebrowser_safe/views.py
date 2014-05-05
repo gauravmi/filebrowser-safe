@@ -6,6 +6,7 @@ import os
 import re
 from httplib2 import Http
 from urllib import urlencode
+from itertools import chain
 
 from django.conf import settings as django_settings
 from django.contrib.admin.views.decorators import staff_member_required
@@ -346,12 +347,17 @@ def upload(request):
     posturl = "fb_do_upload"
     youtube_token = ""
     template = 'upload.html'
+    allowed_file_formats = ",".join(chain.from_iterable(get_settings_var()['EXTENSIONS'].values()))
+    print allowed_file_formats
+
     if display:
-				template = 'yt_upload.html'
+        template = 'yt_upload.html'
+        allowed_file_formats = ",".join(chain.from_iterable(get_settings_var()['YT_SUPPORTED_FILE_FORMATS'].values()))
     return render_to_response('filebrowser/'+template, {
 				'youtube_token':youtube_token,
 				'posturl': posturl,
         'query': query,
+        'allowed_file_formats':allowed_file_formats,
         'display': display,
         'title': _(u'Select files to upload'),
         'settings_var': get_settings_var(),
@@ -422,7 +428,7 @@ def _upload_file(request):
             path = os.path.join(get_directory(), folder)
             file_name = os.path.join(path, filedata.name)
             if exists:
-                default_storage.move(smart_text(uploadedfile), smart_text(file_name), allow_overwrite=True)
+                default_storage.move(smart_text(uploadedfile), smart_texst(file_name), allow_overwrite=True)
 
             # POST UPLOAD SIGNAL
             filebrowser_post_upload.send(sender=request, path=request.POST.get('folder'), file=FileObject(smart_text(file_name)))

@@ -21,7 +21,7 @@
 			<fieldset class="module aligned">
                 <div class="form-row">
                     <div id='upload-file-container'>
-                        <input type="file" name="file_upload" id="yt_file_upload" class="select_file" multiple/>
+                        <input type="file" name="file_upload" id="yt_file_upload" class="select_file" accept={{allowed_file_formats}}/>
                             <div class="file-name-container"></div>
                     </div>
                 </div>
@@ -36,26 +36,16 @@
 		<fieldset class="module aligned collapse-closed">
         <h2>{% trans "Help" %}</h2>
         <div class="form-row" >
-            {% for extension in settings_var.EXTENSIONS.items %}
-            {% ifnotequal extension.0 'Folder' %}
-            <label class="required">{% if forloop.first %}{% trans "Allowed" %}:{% else %}&nbsp;{% endif %}</label>
+            {% for extension in settings_var.YT_SUPPORTED_FILE_FORMATS.items %}
+            <label class="required">{% trans "Allowed" %}</label>
             <p>{{ extension.0|safe }} ({{ extension.1|join:", "|safe }})</p>
-            {% endifnotequal %}
             {% endfor %}
         </div>
         <div class="form-row" >
             <label class="required">{% trans "Max. Filesize" %}:</label>
             <p>{{ settings_var.MAX_UPLOAD_SIZE|filesizeformat }}</p>
         </div>
-        {% if settings_var.CONVERT_FILENAME %}
-        <div class="form-row" >
-            <label class="required">&nbsp;</label>
-            <p>
-                {% trans "The Name will be converted to lowercase. Spaces will be replaced with underscores." %}
-            </p>
-        </div>
-        {% endif %}
-    </fieldset>    
+    </fieldset>
 	</div>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
 <script type="text/javascript" src="{{ settings_var.URL_FILEBROWSER_MEDIA }}js/yt_upload.js"></script>

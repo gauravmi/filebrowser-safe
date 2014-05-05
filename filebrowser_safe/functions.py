@@ -194,6 +194,7 @@ def get_settings_var():
     settings_var['MAX_UPLOAD_SIZE'] = MAX_UPLOAD_SIZE
     # Convert Filenames
     settings_var['CONVERT_FILENAME'] = CONVERT_FILENAME
+    settings_var['YT_SUPPORTED_FILE_FORMATS'] = YT_SUPPORTED_FILE_FORMATS
     return settings_var
 
 
