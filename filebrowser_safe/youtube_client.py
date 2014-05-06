@@ -19,6 +19,3 @@ class YoutubeClient:
 			self.yt_service.password = settings.YOUTUBE["password"]
 			self.yt_service.source = settings.YOUTUBE["source"]
 			self.yt_service.redirect_url = settings.YOUTUBE["redirect_url"]
-
-	def get_uploaded_videos(self):
-		url = 'http://gdata.youtube.com/feeds/api/users/gaurav/uploads'		

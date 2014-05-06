@@ -104,7 +104,7 @@ def get_access_token(request):
 				print settings.YOUTUBE["redirect_url"]
 				nexturl = settings.YOUTUBE["redirect_url"]
 
-		redirect_url_with_video_type = '%s?%s' % (nexturl,'type=Video-field')
+		redirect_url_with_video_type = '%s?%s' % (nexturl,'type=Video-Field')
 		posturl = posturl+"?nexturl="+ redirect_url_with_video_type
 
 		response_data = {
@@ -121,7 +121,7 @@ def browse_videos(request):
     if search_terms:
 		query = gdata.youtube.service.YouTubeVideoQuery()
 		query.vq = search_terms
-		query.author = "+Gaurav"
+		query.author = settings.YOUTUBE.get("username","")
 		query.orderby = 'viewCount'
 		videos = client.yt_service.YouTubeQuery(query)
     else:
@@ -144,13 +144,14 @@ def browse_videos(request):
     results_var['results_current']=results_var['select_total']=results_var['results_total']=results_var['images_total'] = len(videos.entry)
 
     return render_to_response('filebrowser/index.html', {
+        'yt_service': client.yt_service,
         'display': display,
         'p': p,
         'results_var':results_var,
         'query':query,
         'page': page,
         'settings_var': get_settings_var(),
-        'breadcrumbs_title': "",
+        'breadcrumbs_title': _(u'Youtube Upload'),
         'videos': videos
     }, context_instance=Context(request))
 
@@ -260,7 +261,7 @@ def browse(request):
         'title': _(u'Media Library'),
         'settings_var': get_settings_var(),
         'breadcrumbs': get_breadcrumbs(query, path),
-        'breadcrumbs_title': "",
+        'breadcrumbs_title': _(u'Upload'),
     }, context_instance=Context(request))
 browse = staff_member_required(never_cache(browse))
 
@@ -396,7 +397,7 @@ def delete_video(request):
 	entry = client.yt_service.GetYouTubeVideoEntry('https://gdata.youtube.com/feeds/api/users/default/uploads/'+request.GET['video_id'])
 	response = client.yt_service.DeleteVideoEntry(entry)
 	redirect_url = reverse('yt_browse_videos')
-	redirect_url_with_query_string = '%s?%s' % (redirect_url,'type=Video-field')
+	redirect_url_with_query_string = '%s?%s' % (redirect_url,'type=Video-Field')
 	return HttpResponseRedirect(redirect_url_with_query_string)
 
 @csrf_exempt

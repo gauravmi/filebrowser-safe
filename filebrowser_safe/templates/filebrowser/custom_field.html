@@ -11,7 +11,7 @@
         <img src="{{ final_attrs.search_icon }}" alt="" />
     </a>
 {% endifequal %}
-{% ifequal final_attrs.format "Video-field" %}
+{% ifequal final_attrs.format "Video-Field" %}
 <a style="padding:5px 10px;" href="javascript:FileBrowser.show('{{ final_attrs.id }}', '{% url "yt_browse_videos" %}?pop=1{% if final_attrs.directory %}&amp;dir={{ final_attrs.directory }}{% endif %}{% if final_attrs.format %}&amp;type={{ final_attrs.format }}{% endif %}');" class="fb_show">
     <img id="video_{{ final_attrs.id }}" src="{{ MEDIA_URL }}" class="preview" />
 </a>

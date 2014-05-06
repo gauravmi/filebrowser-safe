@@ -3,7 +3,11 @@
 
 <span class="media-breadcrumb">
 {% if breadcrumbs or breadcrumbs_title %}
-    <a href="{% url "fb_browse" %}{% query_string "" "dir,filename,p" %}">{% trans 'Media Library' %}</a> <span>&rsaquo;</span>
+    {% if display %}
+        <a href="{% url "fb_browse" %}">{% trans 'Media Library' %}</a> <span>&rsaquo;</span>
+    {% else %}
+        <a href="{% url "fb_browse" %}{% query_string "" "dir,filename,p" %}">{% trans 'Media Library' %}</a> <span>&rsaquo;</span>
+    {%endif%}
 {% else %}
     {% trans 'Media Library' %}
 {% endif %}
@@ -19,7 +23,5 @@
         {% endif %}
     {% endif %}
 {% endfor %}
-{%if display %}{{"Youtube Upload"}}
-{% elif breadcrumbs_title %}{{ breadcrumbs_title }}
-{% endif %}
+{% if breadcrumbs_title %}{{ breadcrumbs_title }}{% endif %}
 </span>

@@ -6,13 +6,14 @@ h1 {margin:-30px 0 15px 0;}
 </style>
 {% endif %}
 {% for file in page.object_list %}
+
             <!-- FILESELECT FOR FILEBROWSEFIELD -->
         {% ifequal query.pop '1' %}
         {% if results_var.select_total %}
         <td class="fb_icon">
             {% selectable file.filetype query.type %}
             {% if selectable %}
-            <a href="javascript://" onclick="FileSubmit('{{ file.media.player.url }}', '{{ file|get_thumbnail_url }}', '{{ file|get_thumbnail_url }}', '{{ "Video-field" }}');" class="fb_selectlink" title="{% trans 'Select' %}"></a>
+            <a href="javascript://" onclick="FileSubmit('{{ file.media.player.url }}', '{{ file|get_thumbnail_url }}', '{{ file|get_thumbnail_url }}', '{{ "Video-Field" }}');" class="fb_selectlink" title="{% trans 'Select' %}"></a>
             {% else %}
             <img src="{{ settings_var.URL_FILEBROWSER_MEDIA }}img/filebrowser_icon_select_disabled.gif" width="23" height="17" />
             {% endif %}
@@ -77,22 +78,17 @@ h1 {margin:-30px 0 15px 0;}
         <!-- FILENAME/DIMENSIONS -->
         <td><b><a href="{{ file.media.player.url }}" target="_blank">{{ file.media.title.text }}</a></b></td>
 
-        <!-- RENAME -->
-        {% if query.pop != '4' %}
-        <td class="fb_icon"><a href="{% url "fb_rename" %}{% query_string %}&amp;filename={{ file.filename }}" class="fb_renamelink" title="{% trans 'Rename' %}"></a></td>
-        {% endif %}
-
         <!-- SIZE -->
-        <td>{{ file.media.duration.seconds }}s</td>
+        <td>{{ file.media.duration.seconds }} sec</td>
 
         <!-- DATE -->
-        <td>{{ file.published.text }}</td>
-
+        <td>{{ file.published.text|format_date }}</td>
+        <td>{% get_video_status yt_service file %}  </td>
         <!-- DELETE -->
         <td class="fb_icon">
             
             <form method="POST" action="{% url "yt_delete_video" %}{% query_string %}&amp;video_id={{ file.media.player.url|video_id }}" id="delete-{{ forloop.counter0 }}">{% csrf_token %}</form>
-            <a href="#" class="fb_deletelink" onclick="if (confirm('{% trans "Are you sure you want to delete this Folder?" %}')) {jQuery('#delete-{{ forloop.counter0 }}').submit();} return false;" title="{% trans 'Delete Folder' %}"></a>
+            <a href="#" class="fb_deletelink" onclick="if (confirm('{% trans "This action will delete video from youtube, are you sure you want to delete this ?" %}')) {jQuery('#delete-{{ forloop.counter0 }}').submit();} return false;" title="{% trans 'Delete Youtube Video' %}"></a>
             
         </td>
 

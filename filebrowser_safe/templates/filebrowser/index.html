@@ -56,13 +56,13 @@
     {% block object-tools %}
     <ul class="object-tools">
     		{% if display|youtube %}
-					<li><a href="{% url "yt_browse_videos"%}{% query_string 'type=Video-field' 'p' %}">{% trans "Videos" %}</a></li>
+					<li><a href="{% url "yt_browse_videos"%}{% query_string 'type=Video-Field' 'p' %}">{% trans "Videos" %}</a></li>
     		{% endif %}
-				{% if display != "Video-field" %}
+				{% if display != "Video-Field" %}
 					<li><a href="{% url "fb_mkdir" %}{% query_string '' 'p' %}">{% trans "New Folder" %}</a></li>
 					<li><a href="{% url "fb_upload" %}{% query_string '' 'p' %}" class="focus">{% trans "Upload" %}</a></li>
         {% else %}
-					<li><a href="{% url "fb_upload" %}{% query_string 'type=Video-field' 'p' %}" class="focus">{% trans "Upload" %}</a></li>
+					<li><a href="{% url "fb_upload" %}{% query_string 'type=Video-Field' 'p' %}" class="focus">{% trans "Upload" %}</a></li>
         {% endif %}
 
     </ul>
@@ -75,7 +75,7 @@
                     <table cellspacing="0">
                         {% include "filebrowser/include/tableheader.html" %}
                         <tbody>
-                        {% if display == "Video-field" %}
+                        {% if display == "Video-Field" %}
                             {% include "filebrowser/include/videofilelisting.html" %}
                         {% elif display == "Image" %}
                             {% include "filebrowser/include/filelisting.html" %}
@@ -91,9 +91,11 @@
         </div>
         <div id="changelist-filter">
             {% include "filebrowser/include/toolbar.html" %}
-            <div class="module filter">
-                {% include "filebrowser/include/filter.html" %}
-            </div>
+            {% if not display%}
+                <div class="module filter">
+                    {% include "filebrowser/include/filter.html" %}
+                </div>
+            {% endif %}
         </div>
     </div>
 </div>
