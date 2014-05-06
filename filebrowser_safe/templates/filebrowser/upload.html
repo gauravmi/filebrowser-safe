@@ -2,7 +2,7 @@
 
 <!-- LOADING -->
 {% load i18n l10n future static fb_tags mezzanine_tags %}
-{% load tags%}
+
 <!-- STYLESHEETS -->
 {% block stylesheets %}
     {{ block.super }}
@@ -27,7 +27,7 @@
         }
         $('#id_file').uploadify({
             'uploader'          : proxy + '{{ settings_var.URL_FILEBROWSER_MEDIA }}uploadify/uploadify.swf',
-            'script'            : '{% get_upload_url display posturl %}',
+            'script'            : '{% url "fb_do_upload" %}',
             'scriptData'        : {'session_key': '{{session_key}}'},
             'checkScript'       : '{% url "fb_check" %}',
             'cancelImg'         : '{{ settings_var.URL_FILEBROWSER_MEDIA }}uploadify/cancel.png',
@@ -36,7 +36,7 @@
             'multi'             : true,
             'fileDesc'          : '{% for extension in settings_var.EXTENSIONS.items %}{% ifnotequal extension.0 'Folder' %}{% for item in extension.1 %}*{{ item|safe }};{% endfor %}{% endifnotequal %}{% endfor %}',
             'fileExt'           : '{% for extension in settings_var.EXTENSIONS.items %}{% ifnotequal extension.0 'Folder' %}{% for item in extension.1 %}*{{ item|safe }};{% endfor %}{% endifnotequal %}{% endfor %}',
-            // 'sizeLimit'         : {{ settings_var.MAX_UPLOAD_SIZE|unlocalize }},
+            'sizeLimit'         : {{ settings_var.MAX_UPLOAD_SIZE|unlocalize }},
             'scriptAccess'      : 'always',
             'queueSizeLimit'    : 50,
             'simUploadLimit'    : 1,

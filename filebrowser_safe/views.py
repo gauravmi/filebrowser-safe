@@ -345,18 +345,15 @@ def upload(request):
     engine = __import__(settings.SESSION_ENGINE, {}, {}, [''])
     session_key = cookie_dict.get(settings.SESSION_COOKIE_NAME, None)
     display = request.GET.get('type',False)
-    posturl = "fb_do_upload"
-    youtube_token = ""
     template = 'upload.html'
     allowed_file_formats = ",".join(chain.from_iterable(get_settings_var()['EXTENSIONS'].values()))
-    print allowed_file_formats
+    breadcrumbs_title = _(u'Upload')
 
     if display:
         template = 'yt_upload.html'
         allowed_file_formats = ",".join(chain.from_iterable(get_settings_var()['YT_SUPPORTED_FILE_FORMATS'].values()))
+        breadcrumbs_title = _(u'Youtube Upload')
     return render_to_response('filebrowser/'+template, {
-				'youtube_token':youtube_token,
-				'posturl': posturl,
         'query': query,
         'allowed_file_formats':allowed_file_formats,
         'display': display,
@@ -364,7 +361,7 @@ def upload(request):
         'settings_var': get_settings_var(),
         'session_key': session_key,
         'breadcrumbs': get_breadcrumbs(query, path),
-        'breadcrumbs_title': _(u'Upload')
+        'breadcrumbs_title': breadcrumbs_title,
     }, context_instance=Context(request))
 upload = staff_member_required(never_cache(upload))
 
