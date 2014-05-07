@@ -72,9 +72,7 @@ for k, v in VERSIONS.items():
     filter_re.append(re.compile(exp))
 
 def get_access_token(request):
-		client = YoutubeClient()
-		client.authenticate()
-		client.yt_service.ProgrammaticLogin()
+		client = YoutubeClient().login()
 		data = dict(request.GET.iterlists())
 
 		title= data['title'][0]
@@ -94,15 +92,14 @@ def get_access_token(request):
 		# create video entry as usual
 		video_entry = gdata.youtube.YouTubeVideoEntry(media=media_group)
 
-		response = client.yt_service.GetFormUploadToken(video_entry)
+		response = client.GetFormUploadToken(video_entry)
 		# parse response tuple and use the variables to build a form (see next code snippet)
 		posturl = response[0]
 		youtube_token = response[1]
 
 		nexturl = ""
 		if settings.YOUTUBE:
-				print settings.YOUTUBE["redirect_url"]
-				nexturl = settings.YOUTUBE["redirect_url"]
+			nexturl = settings.YOUTUBE["redirect_url"]
 
 		redirect_url_with_video_type = '%s?%s' % (nexturl,'type=Video-Field')
 		posturl = posturl+"?nexturl="+ redirect_url_with_video_type
@@ -114,18 +111,16 @@ def get_access_token(request):
 		return HttpResponse(json.dumps(response_data), content_type="application/json")
 
 def browse_videos(request):
-    client = YoutubeClient()
-    client.authenticate()
-    client.yt_service.ProgrammaticLogin()
+    client = YoutubeClient().login()
     search_terms = request.GET.get('q',False)
     if search_terms:
 		query = gdata.youtube.service.YouTubeVideoQuery()
 		query.vq = search_terms
 		query.author = settings.YOUTUBE.get("username","")
 		query.orderby = 'viewCount'
-		videos = client.yt_service.YouTubeQuery(query)
+		videos = client.YouTubeQuery(query)
     else:
-        videos = client.yt_service.GetYouTubeVideoFeed("https://gdata.youtube.com/feeds/api/users/default/uploads")
+        videos = client.GetYouTubeVideoFeed("https://gdata.youtube.com/feeds/api/users/default/uploads")
 
     results_var = {'results_total': 0, 'results_current': 0, 'delete_total': 0, 'images_total': 0, 'select_total': 0}
     query = request.GET.copy()
@@ -144,7 +139,7 @@ def browse_videos(request):
     results_var['results_current']=results_var['select_total']=results_var['results_total']=results_var['images_total'] = len(videos.entry)
 
     return render_to_response('filebrowser/index.html', {
-        'yt_service': client.yt_service,
+        'yt_service': client,
         'display': display,
         'p': p,
         'results_var':results_var,
@@ -388,11 +383,9 @@ filebrowser_pre_upload = Signal(providing_args=["path", "file"])
 filebrowser_post_upload = Signal(providing_args=["path", "file"])
 
 def delete_video(request):
-	client = YoutubeClient()
-	client.authenticate()
-	client.yt_service.ProgrammaticLogin()
-	entry = client.yt_service.GetYouTubeVideoEntry('https://gdata.youtube.com/feeds/api/users/default/uploads/'+request.GET['video_id'])
-	response = client.yt_service.DeleteVideoEntry(entry)
+	client = YoutubeClient().login()
+	entry = client.GetYouTubeVideoEntry('https://gdata.youtube.com/feeds/api/users/default/uploads/'+request.GET['video_id'])
+	response = client.DeleteVideoEntry(entry)
 	redirect_url = reverse('yt_browse_videos')
 	redirect_url_with_query_string = '%s?%s' % (redirect_url,'type=Video-Field')
 	return HttpResponseRedirect(redirect_url_with_query_string)

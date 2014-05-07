@@ -27,7 +27,7 @@
 
 {% elif value|is_instance_of_file %}
 <p class="help mezz-fb-thumbnail" id="help_{{ final_attrs.id }}">
-    <a href="{{ value.url }}" target="_blank" id="link_{{ final_attrs.id }}">
+    <a href="{{ value | get_yt_url }}" target="_blank" id="link_{{ final_attrs.id }}">
         <img id="video_{{ final_attrs.id }}" src="{{ value | get_thumbnail_for_id }}" class="preview" />
     </a>
 </p>

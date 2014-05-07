@@ -8,7 +8,12 @@ class YoutubeClient:
 	def __init__(self):
 		self.yt_service = gdata.youtube.service.YouTubeService()
 
-	def authenticate(self):
+	def login(self):
+		try:
+			print settings.YOUTUBE
+		except Exception as e:
+			print e
+
 		if settings.YOUTUBE:
 			self.yt_service.ssl = settings.YOUTUBE.get("developer_key",False)
 
@@ -19,3 +24,5 @@ class YoutubeClient:
 			self.yt_service.password = settings.YOUTUBE["password"]
 			self.yt_service.source = settings.YOUTUBE["source"]
 			self.yt_service.redirect_url = settings.YOUTUBE["redirect_url"]
+			self.yt_service.ProgrammaticLogin()
+			return self.yt_service

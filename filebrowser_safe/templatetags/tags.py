@@ -14,8 +14,11 @@ def get_thumbnail_url(video):
 def is_instance_of_file(obj):
     return obj.__class__.__name__ == "FileObject"
 
+def get_yt_url(url):
+	return 'http://www.youtube.com/watch?v='+url.name
+
 def get_thumbnail_for_id(url):
-    return "http://img.youtube.com/vi/"+re.findall(r'(?<=v=)(.*)(?=&)', url.name)[0]+"/0.jpg"
+	return "http://img.youtube.com/vi/"+url.name+"/0.jpg"
 
 def youtube(v):
 	try:
@@ -57,3 +60,4 @@ register.filter('get_thumbnail_for_id',get_thumbnail_for_id)
 register.filter('is_instance_of_file',is_instance_of_file)
 register.filter('youtube',youtube)
 register.filter('video_id',video_id)
+register.filter('get_yt_url',get_yt_url)
