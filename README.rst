@@ -23,15 +23,15 @@ features which includes deleting videos from youtbe, listing user uploaded video
 
 to make the add the feature you need to add following configurations to your projct settings file
 
-YOUTUBE={
-      "developer_key": 'xxx',
-      "client_id": 'xxx',
-      "email": 'xxx',
-    "password": 'xxx',
-    "username": 'xxx',
-    "source": 'youtube',
-    "redirect_url": "http:expectedurl.com",
-    "ssl": False,
+YOUTUBE={  
+      "developer_key": 'xxx',  
+      "client_id": 'xxx',  
+      "email": 'xxx',  
+      "password": 'xxx',  
+      "username": 'xxx',  
+      "source": 'youtube',  
+      "redirect_url": "http:expectedurl.com",  
+      "ssl": False,  
 }
 
 where
@@ -42,7 +42,7 @@ other: these values are the normal gmail account credentials
 
 also youcan configure the parameters like
 
-YOUTUBE_DEFAULT_LIST_PER_PAGE = 10
-YOUTUBE_MAX_UPLOAD_SIZE = 2147000000
+      YOUTUBE_DEFAULT_LIST_PER_PAGE = 10  
+      YOUTUBE_MAX_UPLOAD_SIZE = 2147000000  
 
 for pagenation and file size limit respectively.
