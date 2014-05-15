@@ -24,7 +24,7 @@ features which includes deleting videos from youtbe, listing user uploaded video
 to make the add the feature you need to add following configurations to your projct settings file
 
 YOUTUBE={  
-      "developer_key": 'xxx',  
+      "developer_key": 'xxx', 
       "client_id": 'xxx',  
       "email": 'xxx',  
       "password": 'xxx',  
@@ -40,8 +40,7 @@ developer_key : you can get your developer key from here http://code.google.com/
 client_id: this va,ue you is the api credentials for the prject you have registered in gogle console https://console.developers.google.com/project  
 other: these values are the normal gmail account credentials
 
-also youcan configure the parameters like
-
+also youcan configure the parameters like  
       YOUTUBE_DEFAULT_LIST_PER_PAGE = 10  
       YOUTUBE_MAX_UPLOAD_SIZE = 2147000000  
 
